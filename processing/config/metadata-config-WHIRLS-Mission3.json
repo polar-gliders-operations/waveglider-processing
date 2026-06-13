@@ -1,0 +1,772 @@
+{
+    "_comment": "Wave Glider NRT processor config. Controls grid, interpolation, column selection, renaming, and CF metadata.",
+    "mission_config": {
+        "mission_name": "WHIRLS Mission 3",
+        "platform_id": "SV3-1169",
+        "platform_name": "Vetkoek",
+        "start_time": "2026-06-05",
+        "end_time": null,
+        "grid_freq": "10min",
+        "min_dt": "2min"
+    },
+    "global_attributes": {
+        "Conventions": "CF-1.10, ACDD-1.3",
+        "standard_name_vocabulary": "CF Standard Name Table v79",
+        "featureType": "trajectory",
+        "cdm_data_type": "Trajectory",
+        "platform_model": "Waveglider SV3",
+        "platform_type": "uncrewed surface vehicle",
+        "platform_id": "SV3-1169",
+        "platform_name": "Vetkoek",
+        "creator_name": "Johan Edholm",
+        "creator_email": "johan.edholm@gu.se",
+        "institution": "University of Gothenburg",
+        "processing_level": "L1 - NRT, resampled to 10-min grid",
+        "data_type": "Near Real-Time (NRT)",
+        "license": "CC-BY-4.0",
+        "keywords": "trajectory, uncrewed surface vehicle, Waveglider, surface fluxes, Southern Ocean"
+    },
+    "sources": {
+        "telemetry": {
+            "_comment": "CCU telemetry. Battery, speed, heading, alarms, iridium. 15-min ops / 1-min debug.",
+            "type": "json",
+            "glob": "waveglider-telemetry_*.json",
+            "json_key": "recordData",
+            "to_float": false,
+            "keep_vars": [
+                "latitude",
+                "longitude",
+                "gliderHeading",
+                "gliderSpeed",
+                "speedOverGround",
+                "distanceOverGround",
+                "iridiumSignalStrength",
+                "iridiumSessionErrors",
+                "totalPower",
+                "surfaceTemperature",
+                "temperatureSub",
+                "subLeakAlarm",
+                "floatLeakAlarm",
+                "gPSNotFunctioning",
+                "subRebootAlarm",
+                "floatBatteryLowAlarm",
+                "payloadErrorConditionAlarm",
+                "subToFloatCommsAlarm",
+                "overCurrentError"
+            ],
+            "unit_conversions": {
+                "gliderSpeed": {
+                    "factor": 0.514444,
+                    "target": "SPEED_MS_TEL"
+                },
+                "speedOverGround": {
+                    "factor": 0.514444,
+                    "target": "SPEED_OG_TEL"
+                }
+            },
+            "ffill_vars": [
+                "iridiumSignalStrength",
+                "subLeakAlarm",
+                "floatLeakAlarm",
+                "gPSNotFunctioning",
+                "subRebootAlarm",
+                "floatBatteryLowAlarm",
+                "payloadErrorConditionAlarm",
+                "subToFloatCommsAlarm",
+                "overCurrentError"
+            ],
+            "rename": {
+                "gliderHeading": "HEADING_TEL",
+                "distanceOverGround": "DIST_OG_TEL",
+                "iridiumSignalStrength": "IRIDIUM_SIGNAL_TEL",
+                "iridiumSessionErrors": "IRIDIUM_ERRORS_TEL",
+                "totalPower": "BATT_WH_TEL",
+                "surfaceTemperature": "TEMP_FLOAT_TEL",
+                "temperatureSub": "TEMP_SUB_TEL",
+                "subLeakAlarm": "ALARM_LEAK_SUB_TEL",
+                "floatLeakAlarm": "ALARM_LEAK_FLOAT_TEL",
+                "gPSNotFunctioning": "ALARM_GPS_TEL",
+                "subRebootAlarm": "ALARM_REBOOT_SUB_TEL",
+                "floatBatteryLowAlarm": "ALARM_BATT_LOW_TEL",
+                "payloadErrorConditionAlarm": "ALARM_PAYLOAD_TEL",
+                "subToFloatCommsAlarm": "ALARM_COMMS_TEL",
+                "overCurrentError": "ALARM_OVERCURRENT_TEL"
+            },
+            "timestamp_col": "gliderTimeStamp",
+            "interp_method": "linear",
+            "interp_max_gap": "2h",
+            "gap_tolerance": 3,
+            "lat_col": "latitude",
+            "lon_col": "longitude",
+            "gps_name": "tel"
+        },
+        "airsea_cr6": {
+            "_comment": "CR6 datalogger decoded from Iridium packets. 10-min averages onboard.",
+            "type": "csv",
+            "filename": "AirSeaWHIRLS_Decoded.csv",
+            "timestamp_col": "Logger_DateTime",
+            "interp_method": "linear",
+            "interp_max_gap": "2h",
+            "gap_tolerance": 3,
+            "lat_col": null,
+            "lon_col": null,
+            "keep_stats": [
+                "Avg",
+                "Min",
+                "Max",
+                "StdDev"
+            ],
+            "drop_vars": [
+                "Transmission_Time",
+                "RBR_Temp_Correction_Avg",
+                "RBR_Temp_Correction_Min",
+                "RBR_Temp_Correction_Max",
+                "RBR_Temp_Correction_StdDev"
+            ],
+            "rename": {
+                "Ux_gill_Avg": "WIND_U_GILL_MEAN",
+                "Uy_gill_Avg": "WIND_V_GILL_MEAN",
+                "Uz_gill_Avg": "WIND_W_GILL_MEAN",
+                "Ux_gill_Min": "WIND_U_GILL_MIN",
+                "Uy_gill_Min": "WIND_V_GILL_MIN",
+                "Uz_gill_Min": "WIND_W_GILL_MIN",
+                "Ux_gill_Max": "WIND_U_GILL_MAX",
+                "Uy_gill_Max": "WIND_V_GILL_MAX",
+                "Uz_gill_Max": "WIND_W_GILL_MAX",
+                "Ux_gill_StdDev": "WIND_U_GILL_STDDEV",
+                "Uy_gill_StdDev": "WIND_V_GILL_STDDEV",
+                "Uz_gill_StdDev": "WIND_W_GILL_STDDEV",
+                "RBR_Conductivity_Avg": "COND_LEGATO_MEAN",
+                "RBR_Conductivity_Min": "COND_LEGATO_MIN",
+                "RBR_Conductivity_Max": "COND_LEGATO_MAX",
+                "RBR_Conductivity_StdDev": "COND_LEGATO_STDDEV",
+                "RBR_Temp_Avg": "TEMP_WATER_LEGATO_MEAN",
+                "RBR_Temp_Min": "TEMP_WATER_LEGATO_MIN",
+                "RBR_Temp_Max": "TEMP_WATER_LEGATO_MAX",
+                "RBR_Temp_StdDev": "TEMP_WATER_LEGATO_STDDEV",
+                "RBR_Pressure_Avg": "PRES_LEGATO_MEAN",
+                "RBR_Pressure_Min": "PRES_LEGATO_MIN",
+                "RBR_Pressure_Max": "PRES_LEGATO_MAX",
+                "RBR_Pressure_StdDev": "PRES_LEGATO_STDDEV",
+                "RBR_Salinity_Avg": "SAL_LEGATO_MEAN",
+                "RBR_Salinity_Min": "SAL_LEGATO_MIN",
+                "RBR_Salinity_Max": "SAL_LEGATO_MAX",
+                "RBR_Salinity_StdDev": "SAL_LEGATO_STDDEV",
+                "CODA_Temp_Avg": "TEMP_O2_CODA_MEAN",
+                "CODA_Temp_Min": "TEMP_O2_CODA_MIN",
+                "CODA_Temp_Max": "TEMP_O2_CODA_MAX",
+                "CODA_Temp_StdDev": "TEMP_O2_CODA_STDDEV",
+                "CODA_Oxygen_Avg": "O2_CONC_CODA_MEAN",
+                "CODA_Oxygen_Min": "O2_CONC_CODA_MIN",
+                "CODA_Oxygen_Max": "O2_CONC_CODA_MAX",
+                "CODA_Oxygen_StdDev": "O2_CONC_CODA_STDDEV",
+                "CODA_Phase_Avg": "O2_PHASE_CODA_MEAN",
+                "CODA_Phase_Min": "O2_PHASE_CODA_MIN",
+                "CODA_Phase_Max": "O2_PHASE_CODA_MAX",
+                "CODA_Phase_StdDev": "O2_PHASE_CODA_STDDEV",
+                "Cyclops_Chlorophyll_Avg": "CHLOR_CYCLOPS_MEAN",
+                "Cyclops_Chlorophyll_Min": "CHLOR_CYCLOPS_MIN",
+                "Cyclops_Chlorophyll_Max": "CHLOR_CYCLOPS_MAX",
+                "Cyclops_Chlorophyll_StdDev": "CHLOR_CYCLOPS_STDDEV",
+                "wind_direction_Avg": "WIND_FROM_WXT_MEAN",
+                "wind_direction_Min": "WIND_FROM_WXT_MIN",
+                "wind_direction_Max": "WIND_FROM_WXT_MAX",
+                "wind_direction_StdDev": "WIND_FROM_WXT_STDDEV",
+                "wind_speed_Avg": "WIND_SPEED_WXT_MEAN",
+                "wind_speed_Min": "WIND_SPEED_WXT_MIN",
+                "wind_speed_Max": "WIND_SPEED_WXT_MAX",
+                "wind_speed_StdDev": "WIND_SPEED_WXT_STDDEV",
+                "atmospheric_temperature_Avg": "TEMP_AIR_WXT_MEAN",
+                "atmospheric_temperature_Min": "TEMP_AIR_WXT_MIN",
+                "atmospheric_temperature_Max": "TEMP_AIR_WXT_MAX",
+                "atmospheric_temperature_StdDev": "TEMP_AIR_WXT_STDDEV",
+                "relative_humidity_Avg": "RH_WXT_MEAN",
+                "relative_humidity_Min": "RH_WXT_MIN",
+                "relative_humidity_Max": "RH_WXT_MAX",
+                "relative_humidity_StdDev": "RH_WXT_STDDEV",
+                "atmospheric_pressure_Avg": "BARO_PRES_WXT_MEAN",
+                "atmospheric_pressure_Min": "BARO_PRES_WXT_MIN",
+                "atmospheric_pressure_Max": "BARO_PRES_WXT_MAX",
+                "atmospheric_pressure_StdDev": "BARO_PRES_WXT_STDDEV",
+                "rain_intensity_Avg": "RAIN_INTENSITY_WXT_MEAN",
+                "rain_intensity_Min": "RAIN_INTENSITY_WXT_MIN",
+                "rain_intensity_Max": "RAIN_INTENSITY_WXT_MAX",
+                "rain_intensity_StdDev": "RAIN_INTENSITY_WXT_STDDEV",
+                "rain_duration_Avg": "RAIN_DURATION_WXT_MEAN",
+                "rain_peak_Avg": "RAIN_PEAK_WXT_MEAN",
+                "CGR4_Raw_mVolt_Avg": "CGR4_MVOLT_MEAN",
+                "CGR4_Raw_mVolt_Min": "CGR4_MVOLT_MIN",
+                "CGR4_Raw_mVolt_Max": "CGR4_MVOLT_MAX",
+                "CGR4_Raw_mVolt_StdDev": "CGR4_MVOLT_STDDEV",
+                "CGR4_Vtherm_Avg": "CGR4_VTHERM_MEAN",
+                "CGR4_Vtherm_Min": "CGR4_VTHERM_MIN",
+                "CGR4_Vtherm_Max": "CGR4_VTHERM_MAX",
+                "CGR4_Vtherm_StdDev": "CGR4_VTHERM_STDDEV",
+                "CGR4_Rad_Avg": "CGR4_RAD_MEAN",
+                "CGR4_Rad_Min": "CGR4_RAD_MIN",
+                "CGR4_Rad_Max": "CGR4_RAD_MAX",
+                "CGR4_Rad_StdDev": "CGR4_RAD_STDDEV",
+                "SPN1_Raw_Diffuse_Avg": "SPN1_DIFFUSE_MEAN",
+                "SPN1_Raw_Diffuse_Min": "SPN1_DIFFUSE_MIN",
+                "SPN1_Raw_Diffuse_Max": "SPN1_DIFFUSE_MAX",
+                "SPN1_Raw_Diffuse_StdDev": "SPN1_DIFFUSE_STDDEV",
+                "SPN1_Raw_Total_Avg": "SPN1_TOTAL_MEAN",
+                "SPN1_Raw_Total_Min": "SPN1_TOTAL_MIN",
+                "SPN1_Raw_Total_Max": "SPN1_TOTAL_MAX",
+                "SPN1_Raw_Total_StdDev": "SPN1_TOTAL_STDDEV"
+            }
+        },
+        "weather_airmar": {
+            "_comment": "Airmar 200WX via WGMS weather report. Primary GPS source.",
+            "type": "json",
+            "glob": "waveglider-weather_*.json",
+            "json_key": null,
+            "timestamp_col": "timeStamp",
+            "interp_method": "linear",
+            "interp_max_gap": "1h",
+            "gap_tolerance": 3,
+            "lat_col": "latitude",
+            "lon_col": "longitude",
+            "gps_name": "airmar",
+            "to_float": true,
+            "drop_vars": [
+                "gustTime(hour)",
+                "gustTime(minute)",
+                "numValidWindSamples"
+            ],
+            "unit_conversions": {
+                "avgWindSpeed(kt)": {
+                    "factor": 0.514444,
+                    "target": "WIND_SPEED_AIRMAR_MEAN"
+                },
+                "stdDevWindSpeed(kt)": {
+                    "factor": 0.514444,
+                    "target": "WIND_SPEED_AIRMAR_STDDEV"
+                },
+                "gustSpeed(kt)": {
+                    "factor": 0.514444,
+                    "target": "GUST_SPEED_AIRMAR_MEAN"
+                }
+            },
+            "rename": {
+                "avgTemp(C)": "TEMP_AIR_AIRMAR_MEAN",
+                "avgPress(mbar)": "BARO_PRES_AIRMAR_MEAN",
+                "avgWindDir(deg)": "WIND_FROM_AIRMAR_MEAN",
+                "stdDevWindDir(deg)": "WIND_FROM_AIRMAR_STDDEV",
+                "gustDir(deg)": "GUST_DIR_AIRMAR_MEAN"
+            }
+        },
+        "waves": {
+            "_comment": "GPSWaves wave statistics. 30-min.",
+            "type": "json",
+            "glob": "waveglider-waves_*.json",
+            "json_key": null,
+            "timestamp_col": "timeStamp",
+            "interp_method": "linear",
+            "interp_max_gap": "1h",
+            "gap_tolerance": 3,
+            "lat_col": "latitude",
+            "lon_col": "longitude",
+            "gps_name": null,
+            "to_float": true,
+            "drop_vars": [
+                "fs (Hz)",
+                "sample Gaps",
+                "samples"
+            ],
+            "rename": {
+                "hs (m)": "WAVE_SIGNIFICANT_HEIGHT",
+                "ta (s)": "WAVE_AVERAGE_PERIOD",
+                "tp (s)": "WAVE_DOMINANT_PERIOD",
+                "dp (deg)": "WAVE_DOMINANT_DIRECTION"
+            }
+        },
+        "amps": {
+            "_comment": "AMPS battery/solar summary. 1-hr cadence.",
+            "type": "json",
+            "glob": "waveglider-amps_*.json",
+            "json_key": "recordData",
+            "timestamp_col": "gliderTimeStamp",
+            "interp_method": "ffill",
+            "interp_max_gap": "2h",
+            "gap_tolerance": 3,
+            "lat_col": "gliderLatitude",
+            "lon_col": "gliderLongitude",
+            "gps_name": null,
+            "to_float": true,
+            "drop_vars": [
+                "recordData",
+                "reportFormatVersion",
+                "gliderTaskAddress",
+                "gliderBoardAddress"
+            ],
+            "unit_conversions": {
+                "totalBatteryPower": {
+                    "factor": 0.001,
+                    "target": "BATT_WH_AMPS"
+                },
+                "solarPowerGenerated": {
+                    "factor": 0.001,
+                    "target": "SOLAR_W_AMPS"
+                },
+                "outputPortPower": {
+                    "factor": 0.001,
+                    "target": "OUTPUT_W_AMPS"
+                },
+                "batteryChargingPower": {
+                    "factor": 0.001,
+                    "target": "CHARGE_W_AMPS"
+                }
+            },
+            "rename": {
+                "batteryChargingCurrent": "CHARGE_A_AMPS"
+            }
+        },
+        "amps_solar": {
+            "_comment": "Per-panel solar power. 1-hr cadence. Panels 1-4.",
+            "type": "json",
+            "glob": "waveglider-amps-solar_*.json",
+            "json_key": "recordData",
+            "timestamp_col": "timeStamp",
+            "interp_method": "ffill",
+            "interp_max_gap": "2h",
+            "gap_tolerance": 3,
+            "lat_col": null,
+            "lon_col": null,
+            "gps_name": null,
+            "to_float": true,
+            "keep_pattern": "panelPower[1-4]",
+            "rename": {
+                "panelPower1": "SOLAR_W_PANEL1_AMPS",
+                "panelPower2": "SOLAR_W_PANEL2_AMPS",
+                "panelPower3": "SOLAR_W_PANEL3_AMPS",
+                "panelPower4": "SOLAR_W_PANEL4_AMPS"
+            }
+        },
+        "vegas": {
+            "_comment": "VeGAS pCO2 system. ~15-min. Atm=-50 during calibration cycles.",
+            "type": "csv",
+            "filename": "VeGAS_decoded.csv",
+            "timestamp_col": "glider_time",
+            "interp_method": "linear",
+            "interp_max_gap": "1h",
+            "gap_tolerance": 3,
+            "lat_col": "Latitude",
+            "lon_col": "Longitude",
+            "gps_name": "vegas",
+            "keep_vars": [
+                "glider_time",
+                "Latitude",
+                "Longitude",
+                "Ocean CO2 Ave",
+                "Atmosphere CO2 Ave",
+                "EQ CO2 Ave",
+                "EQ Press Ave",
+                "EQ Temp Ave",
+                "Supply Voltage"
+            ],
+            "rename": {
+                "Ocean CO2 Ave": "VEGAS_PCO2_OCN",
+                "Atmosphere CO2 Ave": "VEGAS_PCO2_ATM",
+                "EQ CO2 Ave": "VEGAS_PCO2_EQ",
+                "EQ Press Ave": "VEGAS_PRES_EQ",
+                "EQ Temp Ave": "VEGAS_TEMP_EQ",
+                "Supply Voltage": "VEGAS_SUPPLY_V"
+            }
+        }
+    },
+    "gps_priority": [
+        "airmar",
+        "tel",
+        "vegas"
+    ],
+    "cf_metadata": {
+        "WIND_U_GILL_MEAN": {
+            "standard_name": "eastward_wind",
+            "units": "m s-1",
+            "long_name": "Eastward wind component (Gill R3-50, 10-min mean)"
+        },
+        "WIND_V_GILL_MEAN": {
+            "standard_name": "northward_wind",
+            "units": "m s-1",
+            "long_name": "Northward wind component (Gill R3-50, 10-min mean)"
+        },
+        "WIND_W_GILL_MEAN": {
+            "standard_name": "upward_air_velocity",
+            "units": "m s-1",
+            "long_name": "Vertical wind component (Gill R3-50, 10-min mean)"
+        },
+        "TEMP_WATER_LEGATO_MEAN": {
+            "standard_name": "sea_water_temperature",
+            "units": "degree_C",
+            "long_name": "Sea surface temperature (RBR Legato, 10-min mean)"
+        },
+        "SAL_LEGATO_MEAN": {
+            "standard_name": "sea_water_practical_salinity",
+            "units": "1",
+            "long_name": "Sea surface salinity (RBR Legato, 10-min mean)"
+        },
+        "PRES_LEGATO_MEAN": {
+            "standard_name": "sea_water_pressure",
+            "units": "dbar",
+            "long_name": "Sea surface pressure (RBR Legato, 10-min mean)"
+        },
+        "COND_LEGATO_MEAN": {
+            "standard_name": "sea_water_electrical_conductivity",
+            "units": "mS cm-1",
+            "long_name": "Sea surface conductivity (RBR Legato, 10-min mean)"
+        },
+        "O2_CONC_CODA_MEAN": {
+            "standard_name": "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water",
+            "units": "mmol m-3",
+            "long_name": "Dissolved oxygen concentration (RBRcoda, 10-min mean)"
+        },
+        "O2_PHASE_CODA_MEAN": {
+            "standard_name": "",
+            "units": "degree",
+            "long_name": "Oxygen optode phase (RBRcoda, 10-min mean)"
+        },
+        "CHLOR_CYCLOPS_MEAN": {
+            "standard_name": "mass_concentration_of_chlorophyll_in_sea_water",
+            "units": "ug L-1",
+            "long_name": "Chlorophyll fluorescence (Turner Cyclops-7F, 10-min mean)"
+        },
+        "WIND_SPEED_WXT_MEAN": {
+            "standard_name": "wind_speed",
+            "units": "m s-1",
+            "long_name": "Wind speed (Vaisala WXT536, 10-min mean)"
+        },
+        "WIND_FROM_WXT_MEAN": {
+            "standard_name": "wind_from_direction",
+            "units": "degree",
+            "long_name": "Wind direction (Vaisala WXT536, 10-min mean)"
+        },
+        "TEMP_AIR_WXT_MEAN": {
+            "standard_name": "air_temperature",
+            "units": "degree_C",
+            "long_name": "Air temperature (Vaisala WXT536, 10-min mean)"
+        },
+        "RH_WXT_MEAN": {
+            "standard_name": "relative_humidity",
+            "units": "percent",
+            "long_name": "Relative humidity (Vaisala WXT536, 10-min mean)"
+        },
+        "BARO_PRES_WXT_MEAN": {
+            "standard_name": "air_pressure",
+            "units": "hPa",
+            "long_name": "Barometric pressure (Vaisala WXT536, 10-min mean)"
+        },
+        "RAIN_INTENSITY_WXT_MEAN": {
+            "standard_name": "rainfall_rate",
+            "units": "mm hr-1",
+            "long_name": "Rain intensity (Vaisala WXT536, 10-min mean)"
+        },
+        "CGR4_RAD_MEAN": {
+            "standard_name": "downwelling_longwave_flux_in_air",
+            "units": "W m-2",
+            "long_name": "Longwave downwelling radiation (Kipp & Zonen CGR4, 10-min mean)"
+        },
+        "SPN1_TOTAL_MEAN": {
+            "standard_name": "downwelling_shortwave_flux_in_air",
+            "units": "W m-2",
+            "long_name": "Total shortwave radiation (Delta-T SPN1, 10-min mean)"
+        },
+        "SPN1_DIFFUSE_MEAN": {
+            "standard_name": "diffuse_downwelling_shortwave_flux_in_air",
+            "units": "W m-2",
+            "long_name": "Diffuse shortwave radiation (Delta-T SPN1, 10-min mean)"
+        },
+        "TEMP_AIR_AIRMAR_MEAN": {
+            "standard_name": "air_temperature",
+            "units": "degree_C",
+            "long_name": "Air temperature (Airmar 200WX, 30-min mean)"
+        },
+        "BARO_PRES_AIRMAR_MEAN": {
+            "standard_name": "air_pressure",
+            "units": "hPa",
+            "long_name": "Barometric pressure (Airmar 200WX, 30-min mean)"
+        },
+        "WIND_SPEED_AIRMAR_MEAN": {
+            "standard_name": "wind_speed",
+            "units": "m s-1",
+            "long_name": "Wind speed (Airmar 200WX, 30-min mean)"
+        },
+        "WIND_FROM_AIRMAR_MEAN": {
+            "standard_name": "wind_from_direction",
+            "units": "degree",
+            "long_name": "Wind direction (Airmar 200WX, 30-min mean)"
+        },
+        "WAVE_SIGNIFICANT_HEIGHT": {
+            "standard_name": "sea_surface_wave_significant_height",
+            "units": "m",
+            "long_name": "Significant wave height (GPSWaves, 30-min)"
+        },
+        "WAVE_AVERAGE_PERIOD": {
+            "standard_name": "sea_surface_wave_mean_period",
+            "units": "s",
+            "long_name": "Average wave period (GPSWaves, 30-min)"
+        },
+        "WAVE_DOMINANT_PERIOD": {
+            "standard_name": "sea_surface_wave_period_at_variance_spectral_density_maximum",
+            "units": "s",
+            "long_name": "Dominant wave period (GPSWaves, 30-min)"
+        },
+        "WAVE_DOMINANT_DIRECTION": {
+            "standard_name": "sea_surface_wave_from_direction",
+            "units": "degree",
+            "long_name": "Dominant wave direction (GPSWaves, 30-min)"
+        },
+        "BATT_WH_TEL": {
+            "standard_name": "",
+            "units": "Wh",
+            "long_name": "Battery energy (CCU telemetry, 15-min)"
+        },
+        "BATT_WH_AMPS": {
+            "standard_name": "",
+            "units": "Wh",
+            "long_name": "Battery energy (AMPS report, 1-hr)"
+        },
+        "SOLAR_W_AMPS": {
+            "standard_name": "",
+            "units": "W",
+            "long_name": "Total solar power generated (AMPS report, 1-hr)"
+        },
+        "OUTPUT_W_AMPS": {
+            "standard_name": "",
+            "units": "W",
+            "long_name": "Total output port power (AMPS report, 1-hr)"
+        },
+        "CHARGE_W_AMPS": {
+            "standard_name": "",
+            "units": "W",
+            "long_name": "Battery charging power (AMPS report, 1-hr)"
+        },
+        "SOLAR_W_PANEL1_AMPS": {
+            "standard_name": "",
+            "units": "W",
+            "long_name": "Solar panel 1 power (AMPS solar report, 1-hr)"
+        },
+        "SOLAR_W_PANEL2_AMPS": {
+            "standard_name": "",
+            "units": "W",
+            "long_name": "Solar panel 2 power (AMPS solar report, 1-hr)"
+        },
+        "SOLAR_W_PANEL3_AMPS": {
+            "standard_name": "",
+            "units": "W",
+            "long_name": "Solar panel 3 power (AMPS solar report, 1-hr)"
+        },
+        "SOLAR_W_PANEL4_AMPS": {
+            "standard_name": "",
+            "units": "W",
+            "long_name": "Solar panel 4 power (AMPS solar report, 1-hr)"
+        },
+        "HEADING_TEL": {
+            "standard_name": "platform_course",
+            "units": "degree",
+            "long_name": "Vehicle heading (CCU telemetry)"
+        },
+        "SPEED_MS_TEL": {
+            "standard_name": "platform_speed_wrt_ground",
+            "units": "m s-1",
+            "long_name": "Vehicle speed (CCU telemetry)"
+        },
+        "IRIDIUM_SIGNAL_TEL": {
+            "standard_name": "",
+            "units": "1",
+            "long_name": "Iridium signal strength 0-5 (CCU telemetry)"
+        },
+        "IRIDIUM_ERRORS_TEL": {
+            "standard_name": "",
+            "units": "1",
+            "long_name": "Cumulative Iridium session errors (CCU telemetry)"
+        },
+        "VEGAS_PCO2_OCN": {
+            "standard_name": "surface_partial_pressure_of_carbon_dioxide_in_sea_water",
+            "units": "uatm",
+            "long_name": "Ocean pCO2 (VeGAS, ~15-min)"
+        },
+        "VEGAS_PCO2_ATM": {
+            "standard_name": "mole_fraction_of_carbon_dioxide_in_air",
+            "units": "uatm",
+            "long_name": "Atmospheric pCO2 (VeGAS, every 3rd cycle; -50=calibrating)"
+        },
+        "VEGAS_PCO2_EQ": {
+            "standard_name": "",
+            "units": "uatm",
+            "long_name": "Equilibrator pCO2 (VeGAS)"
+        },
+        "VEGAS_PRES_EQ": {
+            "standard_name": "",
+            "units": "hPa",
+            "long_name": "Equilibrator pressure (VeGAS)"
+        },
+        "VEGAS_TEMP_EQ": {
+            "standard_name": "",
+            "units": "degree_C",
+            "long_name": "Equilibrator temperature (VeGAS)"
+        },
+        "VEGAS_SUPPLY_V": {
+            "standard_name": "",
+            "units": "V",
+            "long_name": "VeGAS supply voltage"
+        },
+        "TEMP_O2_CODA_MEAN": {
+            "standard_name": "sea_water_temperature",
+            "units": "degree_C",
+            "long_name": "Temperature from oxygen optode (RBRcoda, 10-min mean)"
+        },
+        "RAIN_DURATION_WXT_MEAN": {
+            "standard_name": "",
+            "units": "s",
+            "long_name": "Rain duration (Vaisala WXT536, 10-min mean)"
+        },
+        "RAIN_PEAK_WXT_MEAN": {
+            "standard_name": "",
+            "units": "mm hr-1",
+            "long_name": "Rain peak intensity (Vaisala WXT536, 10-min mean)"
+        },
+        "CGR4_MVOLT_MEAN": {
+            "standard_name": "",
+            "units": "mV",
+            "long_name": "CGR4 raw signal voltage (10-min mean)"
+        },
+        "CGR4_VTHERM_MEAN": {
+            "standard_name": "",
+            "units": "V",
+            "long_name": "CGR4 thermistor voltage (10-min mean)"
+        },
+        "GUST_DIR_AIRMAR_MEAN": {
+            "standard_name": "wind_from_direction",
+            "units": "degree",
+            "long_name": "Gust direction (Airmar 200WX, 30-min mean)"
+        },
+        "GUST_SPEED_AIRMAR_MEAN": {
+            "standard_name": "wind_speed_of_gust",
+            "units": "m s-1",
+            "long_name": "Gust wind speed (Airmar 200WX, 30-min mean)"
+        },
+        "SPEED_OG_TEL": {
+            "standard_name": "platform_speed_wrt_ground",
+            "units": "m s-1",
+            "long_name": "Speed over ground (CCU telemetry)"
+        },
+        "DIST_OG_TEL": {
+            "standard_name": "",
+            "units": "m",
+            "long_name": "Distance over ground (CCU telemetry)"
+        },
+        "TEMP_FLOAT_TEL": {
+            "standard_name": "air_temperature",
+            "units": "degree_C",
+            "long_name": "Float hull temperature (CCU telemetry)"
+        },
+        "TEMP_SUB_TEL": {
+            "standard_name": "",
+            "units": "degree_C",
+            "long_name": "Sub hull temperature (CCU telemetry)"
+        },
+        "CHARGE_A_AMPS": {
+            "standard_name": "",
+            "units": "A",
+            "long_name": "Battery charging current (AMPS report, 1-hr)"
+        },
+        "ALARM_LEAK_SUB_TEL": {
+            "standard_name": "",
+            "units": "1",
+            "long_name": "Sub leak alarm flag (CCU telemetry)"
+        },
+        "ALARM_LEAK_FLOAT_TEL": {
+            "standard_name": "",
+            "units": "1",
+            "long_name": "Float leak alarm flag (CCU telemetry)"
+        },
+        "ALARM_GPS_TEL": {
+            "standard_name": "",
+            "units": "1",
+            "long_name": "GPS not functioning alarm flag (CCU telemetry)"
+        },
+        "ALARM_REBOOT_SUB_TEL": {
+            "standard_name": "",
+            "units": "1",
+            "long_name": "Sub reboot alarm flag (CCU telemetry)"
+        },
+        "ALARM_BATT_LOW_TEL": {
+            "standard_name": "",
+            "units": "1",
+            "long_name": "Float battery low alarm flag (CCU telemetry)"
+        },
+        "ALARM_PAYLOAD_TEL": {
+            "standard_name": "",
+            "units": "1",
+            "long_name": "Payload error condition alarm flag (CCU telemetry)"
+        },
+        "ALARM_COMMS_TEL": {
+            "standard_name": "",
+            "units": "1",
+            "long_name": "Sub-to-float comms alarm flag (CCU telemetry)"
+        },
+        "ALARM_OVERCURRENT_TEL": {
+            "standard_name": "",
+            "units": "1",
+            "long_name": "Overcurrent error flag (CCU telemetry)"
+        }
+    },
+    "sensors": {
+        "WXT536": {
+            "vendor_name": "Vaisala",
+            "model_name": "WXT536",
+            "installed_height_m": 1.0,
+            "calibration_status": "uncalibrated"
+        },
+        "GILL": {
+            "vendor_name": "Gill",
+            "model_name": "R3-50",
+            "installed_height_m": 1.0,
+            "calibration_status": "calibrated",
+            "calibration_date": "2025-04-25"
+        },
+        "LEGATO": {
+            "vendor_name": "RBR",
+            "model_name": "Legato3",
+            "installed_height_m": -0.25,
+            "calibration_status": "uncalibrated"
+        },
+        "CODA": {
+            "vendor_name": "RBR",
+            "model_name": "coda T.ODO",
+            "installed_height_m": -0.25,
+            "calibration_status": "uncalibrated"
+        },
+        "CYCLOPS": {
+            "vendor_name": "Turner Designs",
+            "model_name": "Cyclops-7F",
+            "installed_height_m": -0.25,
+            "calibration_status": "uncalibrated"
+        },
+        "AIRMAR": {
+            "vendor_name": "Airmar",
+            "model_name": "200WX",
+            "installed_height_m": 0.8,
+            "calibration_status": "uncalibrated"
+        },
+        "CGR4": {
+            "vendor_name": "Kipp & Zonen",
+            "model_name": "CGR4",
+            "installed_height_m": 1.0,
+            "calibration_status": "uncalibrated"
+        },
+        "SPN1": {
+            "vendor_name": "Delta-T Devices",
+            "model_name": "SPN1",
+            "installed_height_m": 1.0,
+            "calibration_status": "uncalibrated"
+        },
+        "VEGAS": {
+            "vendor_name": "STS",
+            "model_name": "VeGAS pCO2",
+            "installed_height_m": 0.0,
+            "calibration_status": "uncalibrated"
+        }
+    }
+}
