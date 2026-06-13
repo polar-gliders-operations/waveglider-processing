@@ -4,3 +4,30 @@
 
 wg1169/
 wg1170/
+.DS_Store
+processing/01-raw-data-familiarisation.ipynb
+processing/Cf registry.yml
+processing/data-download-summary.sh
+processing/og1_builder.py
+processing/radiometer_cal.py
+processing/summary copy.md
+processing/summary-2.md
+processing/summary-3.md
+processing/summary-sent-to-SM.md
+processing/summary.md
+processing/toa5_loader.py
+processing/tob3_reader.py
+processing/waveglider-processing-nrt-data.ipynb
+processing/wg-processing-updated.py
+processing/__pycache__/radiometer_cal.cpython-39.pyc
+processing/__pycache__/toa5_loader.cpython-39.pyc
+processing/__pycache__/toa5_loader.cpython-313.pyc
+processing/__pycache__/tob3_reader.cpython-39.pyc
+processing/config/metadata-config-template.json
+processing/config/mission.yaml
+processing/config/platform_registry.yaml
+processing/config/radiometer_calibration.yaml
+processing/config/readme.md
+processing/config/sensor_registry.yaml
+processing/config/variable_registry.yaml
+processing/waveglider-processing-nrt-data.ipynb
