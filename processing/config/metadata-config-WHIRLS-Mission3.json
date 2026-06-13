@@ -21,7 +21,7 @@
         "creator_name": "Johan Edholm",
         "creator_email": "johan.edholm@gu.se",
         "institution": "University of Gothenburg",
-        "processing_level": "L1 - NRT, resampled to 10-min grid",
+        "processing_level": "L1 - NRT, resampled to a 10-min grid",
         "data_type": "Near Real-Time (NRT)",
         "license": "CC-BY-4.0",
         "keywords": "trajectory, uncrewed surface vehicle, Waveglider, surface fluxes, Southern Ocean"
